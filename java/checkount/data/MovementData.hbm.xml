@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+   <class name="checkount.data.movement.MovementData" table="MOVEMENT" >
+     <id name="idMoviment" column="ID_MOVIMENT" type="string"/>
+     <property name="date" column="DATE_M" />
+     <property name="descripction" column="DESCRIPTION"  />
+     <property name="import_m" column="IMPORT_M" />
+     <property name="category" column="CATEGORY_M"/>
+   </class>
+ </hibernate-mapping>

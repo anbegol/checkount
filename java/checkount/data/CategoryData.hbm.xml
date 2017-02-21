@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+   <class name="checkount.data.category.CategoryData" table="CATEGORY" >
+     <id column="ID_CATEGORY" name="idCategory" type="string"/>
+     <property name="description" column="DESCRIPTION" />
+     <property name="regularExp" column="REGULAR_EXP" />
+     <property name="idCategoryFather" column="ID_CATEGORY_FATHER"/>
+   </class>
+ </hibernate-mapping>
