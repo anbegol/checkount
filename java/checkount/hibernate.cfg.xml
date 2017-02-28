@@ -4,8 +4,8 @@
 	<session-factory>
 		<property name="hibernate.connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
 		<property name="hibernate.connection.url">jdbc:oracle:thin:@localhost:1521:bbdd</property>
-		<property name="hibernate.connection.username">checkount</property>
-		<property name="hibernate.connection.password">checkount</property>
+		<property name="hibernate.connection.username">count</property>
+		<property name="hibernate.connection.password">count</property>
 		<property name="hibernate.show_sql">true</property>
 		<property name="hibernate.dialect">org.hibernate.dialect.Oracle12cDialect</property>
 		

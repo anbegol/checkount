@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
@@ -65,6 +64,7 @@ public class ReadCVS {
 			e.printStackTrace();
 		}
 
+		// AHORA a interar los valores.
 		try {
 			while (csvReader.readRecord()) {
 				
@@ -73,11 +73,10 @@ public class ReadCVS {
 					SimpleDateFormat format = new SimpleDateFormat("dd.MM.yy");
 					String descripcion = csvReader.get("Concepto");
 					String importe = csvReader.get("Importe");
+
 					String idMoviment = fechaEjecucion + "#" + descripcion;
 							
-					DecimalFormat df = new DecimalFormat("#,###.#");
-					String importFormat = df.parse(importe).toString();
-					MovementData primerLectura = new MovementData(idMoviment, format.parse(fechaEjecucion), descripcion, Double.valueOf(importFormat));
+					MovementData primerLectura = new MovementData(idMoviment, format.parse(fechaEjecucion), descripcion, Double.valueOf(importe));
 					datos.add(primerLectura);
 					System.out.println(fechaEjecucion + " \t " + descripcion + " \t " + importe);
 				} catch(ParseException e) {
