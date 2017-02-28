@@ -22,6 +22,14 @@ public class MovementData implements Serializable {
 	/** Category */
 	private String category;
 	
+	
+	/**
+	 * Empty constructor
+	 */
+	public MovementData() {
+		super();
+	}
+
 	/**
 	 * Constructor
 	 * @param idMoviment

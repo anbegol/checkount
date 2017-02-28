@@ -22,7 +22,7 @@ public class MainBanc {
 	/** Logger */
 	private static final Logger LOGGER = Logger.getLogger(MainBanc.class.getName());
 	/** Messages log */
-	private static final String ERROR_PROCESS = "Error in the process ";
+	private static final String ERROR_PROCESS = "Error in the process";
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
