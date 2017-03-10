@@ -35,7 +35,7 @@ public class CategoryDao {
 	
 	/**
 	 * Get only the types have regulation Expression
-	 * @return List
+	 * @return List category's list
 	 */
 	public List<CategoryData> getRegulationExpCatMoviments() {
 		try {
@@ -50,8 +50,8 @@ public class CategoryDao {
 	}
 
 	/**
-	 * 
-	 * @return List
+	 * Get all children of idType
+	 * @return List category's list
 	 */
 	public List<CategoryData> getAllChildrenbyIdType(String idType) {
 		String query= "SELECT t.ID_TYPE, t.ID_TYPE_FATHER "
@@ -67,31 +67,5 @@ public class CategoryDao {
 		 System.out.println("ERROR AL CARGAR LOS TIPOS DE MOVIMIENTOS" + e);
 		 return null;
 		}
-	}
-
-	/**
-	 * 
-	 * @return List
-	 */
-	public List<CategoryData> getDirectChildrenbyTypeList(List<CategoryData> typeList) {
-		if (typeList != null && !typeList.isEmpty()) {
-			for (CategoryData typeData : typeList) {
-				String query = "SELECT t.ID_TYPE" 
-								+ " FROM REGISTER_TYPE t"
-								+ " WHERE LEVEL = 2"
-								+ " START WITH t.DESCRIPTION_T= '" + typeData.getDescription() + "'"
-								+ " CONNECT BY PRIOR t.ID_TYPE = t.ID_TYPE_FATHER;";
-
-				try {
-					Session session = daoProcess.getSessionFactory().openSession();
-					Criteria criteria = session.createCriteria(CategoryData.class, query);
-					typeData.setChildrenList(criteria.list());
-				} catch (Exception e) {
-					System.out.println("ERROR AL CARGAR LOS TIPOS DE MOVIMIENTOS" + e);
-					return null;
-				}
-			}
-		}
-		return typeList;
 	}
 }
