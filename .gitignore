@@ -4,7 +4,7 @@ doc/
 *.classpath
 *.project
 *.settings
-*.gradle
+.gradle
 /logs
 /build
 
