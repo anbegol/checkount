@@ -1,15 +1,18 @@
-package checkount.impl.process.category;
+package com.checkount.impl.process.category;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import checkount.data.category.CategoryData;
-import checkount.impl.dao.category.CategoryDao;
+import com.checkount.DaoProcess;
+import com.checkount.data.category.CategoryData;
+import com.checkount.impl.dao.category.CategoryDao;
 
 /**
- * Process category
+ * Singleton class.
+ * 
+ * This class contains methods to manage categories.
  *
  */
 public class CategoryProcess {
@@ -17,12 +20,24 @@ public class CategoryProcess {
 	/** Dao Category */
 	private CategoryDao categoryDao;
 	
+	/** Singleton */
+	private static CategoryProcess uniqueInstance = new CategoryProcess();
+	
 	/**
 	 * Constructor
 	 * @param categoryDao
 	 */
-	public CategoryProcess(CategoryDao categoryDao) {
-		this.categoryDao = categoryDao;
+	private CategoryProcess() {
+		DaoProcess daoProcess = DaoProcess.getInstance();
+		this.categoryDao = daoProcess.<CategoryDao>getDao(CategoryDao.class);
+	}
+
+	/**
+	 * Get a unique instance of CategoryProcess
+	 * @return CategoryProcess
+	 */
+	public static CategoryProcess getInstance() {
+		return uniqueInstance;
 	}
 
 	/**
@@ -33,7 +48,7 @@ public class CategoryProcess {
 	public List<CategoryData> getCategoriesWithChild(String idCategory) {
 		
 		// Get categories from bbdd and put the result in a map
-		List<CategoryData> allChildrenbyIdType = categoryDao.getAllChildrenbyIdType(idCategory);
+		List<CategoryData> allChildrenbyIdType = categoryDao.getAllChildrenbyIdCategory(idCategory);
 		Map<String, CategoryData> map = new HashMap<>();
 		for(CategoryData category: allChildrenbyIdType){
 			map.put(category.getIdCategory(), category);
@@ -59,5 +74,4 @@ public class CategoryProcess {
 		}
 		return allChildrenbyIdType;
 	}
-
 }

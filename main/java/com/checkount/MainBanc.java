@@ -1,0 +1,115 @@
+package com.checkount;
+
+import java.awt.EventQueue;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Scanner;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.checkount.impl.process.movements.MovementProcess;
+
+/**
+ * Main class
+ */
+public class MainBanc {
+	
+	/** Logger */
+	private static final Logger LOGGER = LogManager.getLogger(MainBanc.class);
+	
+	/** Messages log */
+	private static final String ERROR_PROCESS = "Error in the process";
+	private static final String LOAD_MOVEMENTS = "The movements are loaded correctly";
+	private static final String EXIT = "The application is closed";
+	private static final String OPTION_NO_AVAILABLE = "Option no available";
+	
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				// Create of scan
+				Scanner scan = new Scanner(System.in);
+				// Print of menu
+				getMenu(scan);
+				// Close scan
+				scan.close();
+			}
+
+			/**
+			 * Method where activate the option selected
+			 * 
+			 * @param pos option selected
+			 * @param scan Util to read from console
+			 * @throws Exception
+			 */
+			private void getMenuOption(int pos, Scanner scan) throws Exception {
+				boolean option = false;
+				while (!option) {
+					if (pos == 1) { // Load Movements
+						// 1. Read movements from cvs
+						System.out.println("Do you want to load the default file? (Y/N)");
+						String load = scan.nextLine();
+						String path = null;
+						if (!load.equalsIgnoreCase("Y")) {
+							path = scan.nextLine();
+						}
+
+						MovementProcess movementProcess = MovementProcess.getInstance();
+						movementProcess.loadMovements(path);
+
+						LOGGER.info(LOAD_MOVEMENTS);
+						option = true;
+
+					} else if (pos == 2) { // Get totalizations by date
+						SimpleDateFormat formatData = new SimpleDateFormat("dd.MM.yy");
+						Date iniData = formatData.parse("01.01.16");
+						Date endData = formatData.parse("31.01.16");
+
+						MovementProcess movementProcess = MovementProcess.getInstance();
+						movementProcess.getTotalizations(iniData, endData);
+						option = true;
+
+					} else if (pos == 3) { // Delete all movements
+						MovementProcess movementProcess = MovementProcess.getInstance();
+						movementProcess.deleteMovements();
+						option = true;
+						
+					} else if(pos == 0) {
+						LOGGER.info(EXIT);
+						System.exit(0);
+						
+					} else {
+						LOGGER.info(OPTION_NO_AVAILABLE);
+						option = true;
+					}
+				}
+			}
+
+			/**
+			 * Method to create the main menu
+			 * @param scan 
+			 */
+			private void getMenu(Scanner scan) {
+				System.out.println("****************************************");
+				System.out.println("MENU");
+				System.out.println("0. Exit program.");
+				System.out.println("1. Load Movements in data base.");
+				System.out.println("2. Get totalizations by date.");
+				System.out.println("3. Detele all movements from data base.");
+				System.out.println("****************************************");
+				
+				// Get the option selected
+				int pos = Integer.valueOf(scan.nextLine());
+				// Activate the option
+				try {
+					getMenuOption(pos, scan);
+					// If no error, to show the menu
+					getMenu(scan);
+				} catch (Exception e) {
+					LOGGER.error(ERROR_PROCESS, e);
+					getMenu(scan);
+				}
+			}
+		});
+	}
+}

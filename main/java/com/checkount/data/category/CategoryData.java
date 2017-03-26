@@ -1,4 +1,4 @@
-package checkount.data.category;
+package com.checkount.data.category;
 
 import java.io.Serializable;
 import java.util.HashSet;

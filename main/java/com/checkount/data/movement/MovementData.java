@@ -1,4 +1,4 @@
-package checkount.data.movement;
+package com.checkount.data.movement;
 
 import java.io.Serializable;
 import java.util.Date;
