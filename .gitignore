@@ -9,5 +9,6 @@ doc/
 /build
 
 # Package Files #
+*.jar
 *.war
 *.ear
