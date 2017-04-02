@@ -41,15 +41,23 @@ public class CategoryProcess {
 	}
 
 	/**
+	 * Get the categories father with their children
 	 * @param idCategory id Category
+	 * @return List List of children of id Category param
 	 */
+	public CategoryData getFatherCategoriesWithChildren(String idCategory) {
 
 		CategoryData result = null;
 		// Get categories from bbdd and put the result in a map
+		List<CategoryData> allChildrenbyIdCategory = categoryDao.getAllChildrenbyIdCategory(idCategory);
 
+		if (allChildrenbyIdCategory != null && !allChildrenbyIdCategory.isEmpty()) {
+			// Create a new aux map to save the children
 			Map<String, List<CategoryData>> mapAux = new HashMap<>();
 
+			// Check the children and assign the children with their father in the aux
 			// map
+			for (CategoryData category : allChildrenbyIdCategory) {
 				if (category.getIdCategoryFather() != null) {
 					List<CategoryData> categoryFather = mapAux.get(category.getIdCategoryFather());
 					if (categoryFather == null) {
@@ -60,11 +68,13 @@ public class CategoryProcess {
 				}
 			}
 
+			for (CategoryData categoryData : allChildrenbyIdCategory) {
 				List<CategoryData> categoryDataMap = mapAux.get(categoryData.getIdCategory());
 				if (categoryDataMap != null) {
 					categoryData.setChildrenList(categoryDataMap);
 				}
 			}
+			result = allChildrenbyIdCategory.get(0);
 		}
 
 		return result;
