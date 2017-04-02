@@ -3,11 +3,15 @@ package com.checkount;
 import java.awt.EventQueue;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.checkount.data.category.CategoryData;
+import com.checkount.data.movement.result.TotalizationResult;
 import com.checkount.impl.process.movements.MovementProcess;
 
 /**
@@ -66,7 +70,8 @@ public class MainBanc {
 						Date endData = formatData.parse("31.01.16");
 
 						MovementProcess movementProcess = MovementProcess.getInstance();
-						movementProcess.getTotalizations(iniData, endData);
+						TotalizationResult totalizations = movementProcess.getTotalizations(iniData, endData);
+						printResultPointTwo(totalizations);
 						option = true;
 
 					} else if (pos == 3) { // Delete all movements
@@ -86,6 +91,39 @@ public class MainBanc {
 			}
 
 			/**
+			 * Print result to point 2
+			 * 
+			 * @param totalizations
+			 */
+			private void printResultPointTwo(TotalizationResult totalizations) {
+				if (totalizations.getCategory() != null) {
+					printRecursivePointTwo(totalizations.getCategory(), totalizations.getTotMap(), 0);
+				}
+			}
+
+			/**
+			 * Recursive method. Print result to point 2.
+			 */
+			private void printRecursivePointTwo(CategoryData category, Map<CategoryData, Double> totMap, int pos) {
+				System.out.println(getTab(pos) + category.getDescription() + " >> " +  totMap.get(category));
+				List<CategoryData> childrenList = category.getChildrenList();
+				if (childrenList != null) {
+					++pos;
+					for (CategoryData children : childrenList) {
+						printRecursivePointTwo(children, totMap, pos);
+					}
+				}
+			}
+
+			private String getTab(int pos) {
+				String result = "";
+				for(int i = 0; i < pos; i++){
+					result += "\t";
+				}
+				return result;
+			}
+
+			/**
 			 * Method to create the main menu
 			 * @param scan 
 			 */
@@ -93,9 +131,9 @@ public class MainBanc {
 				System.out.println("****************************************");
 				System.out.println("MENU");
 				System.out.println("0. Exit program.");
-				System.out.println("1. Load Movements in data base.");
-				System.out.println("2. Get totalizations by date.");
-				System.out.println("3. Detele all movements from data base.");
+				System.out.println("1. Load Movements in database.");
+				System.out.println("2. Get totalizations by date from 01.01.16 to 31.01.16.");
+				System.out.println("3. Detele all movements from database.");
 				System.out.println("****************************************");
 				
 				// Get the option selected

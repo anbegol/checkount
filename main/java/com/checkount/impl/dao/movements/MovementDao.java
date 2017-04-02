@@ -26,9 +26,9 @@ public class MovementDao extends Dao {
 	private static final Logger LOGGER = LogManager.getLogger(MovementDao.class);
 	
 	/** Messages log */
-	private static final String ERROR_SAVE_MOVEMENTS = "Error to save movement in the data base.";
-	private static final String ERROR_DELETE_MOVEMENTS = "Error to delete movement in the data base.";
-	private static final String DELETE_MOVEMENTS = "Delete {0} movements from data base";
+	private static final String ERROR_SAVE_MOVEMENTS = "Error to save movement in the database.";
+	private static final String ERROR_DELETE_MOVEMENTS = "Error to delete movement in the database.";
+	private static final String DELETE_MOVEMENTS = "Delete {0} movements from database";
 	
 	/**
 	 * Constructor

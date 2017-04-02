@@ -41,37 +41,32 @@ public class CategoryProcess {
 	}
 
 	/**
-	 * Get the categories with their children
-	 * @param idCategory
-	 * @return List 
+	 * @param idCategory id Category
 	 */
-	public List<CategoryData> getCategoriesWithChild(String idCategory) {
-		
+
+		CategoryData result = null;
 		// Get categories from bbdd and put the result in a map
-		List<CategoryData> allChildrenbyIdType = categoryDao.getAllChildrenbyIdCategory(idCategory);
-		Map<String, CategoryData> map = new HashMap<>();
-		for(CategoryData category: allChildrenbyIdType){
-			map.put(category.getIdCategory(), category);
-		}
-		
-		// Check the sons and assign the sons with their father
-		for (CategoryData category : allChildrenbyIdType) {
-			if(category.getIdCategoryFather() != null) {
-				CategoryData categoryFather = map.get(category.getIdCategoryFather());
-				List<CategoryData> childrenListF = categoryFather.getChildrenList();
-				if(childrenListF == null) {
-					childrenListF = new ArrayList<>();
+
+			Map<String, List<CategoryData>> mapAux = new HashMap<>();
+
+			// map
+				if (category.getIdCategoryFather() != null) {
+					List<CategoryData> categoryFather = mapAux.get(category.getIdCategoryFather());
+					if (categoryFather == null) {
+						categoryFather = new ArrayList<>();
+					}
+					categoryFather.add(category);
+					mapAux.put(category.getIdCategoryFather(), categoryFather);
 				}
-				childrenListF.add(category);
-				categoryFather.setChildrenList(childrenListF);
-				map.put(category.getIdCategoryFather(), categoryFather);
+			}
+
+				List<CategoryData> categoryDataMap = mapAux.get(categoryData.getIdCategory());
+				if (categoryDataMap != null) {
+					categoryData.setChildrenList(categoryDataMap);
+				}
 			}
 		}
-		
-		for (CategoryData categoryData : allChildrenbyIdType) {
-			CategoryData categoryDataMap = map.get(categoryData.getIdCategory());
-			categoryData.setChildrenList(categoryDataMap.getChildrenList());
-		}
-		return allChildrenbyIdType;
+
+		return result;
 	}
 }

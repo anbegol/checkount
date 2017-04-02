@@ -27,14 +27,14 @@ public class ReadCSV {
 
 	public static final char SEPARATOR = ';';
 	public static final char QUOTE = '"';
-	private static final String DEFAULT_FILE = "C:/Users/mafy/Documents/GitHub/checkount/main/resources/MOV20160101_201603030.csv";
+	private static final String DEFAULT_FILE = "main/resources/movements/MOV20160101_201603030.csv";
 
 	/**
 	 * Get the movements from csv file
 	 * 
 	 * @return List of movements
 	 */
-	public static List<MovementData> csvreader(String path) {
+	public List<MovementData> csvreader(String path) {
 
 		if (path == null) {
 			path = DEFAULT_FILE;
