@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.checkount.DaoProcess;
+import com.checkount.DaoProcessSingleton;
 import com.checkount.data.category.CategoryData;
 import com.checkount.impl.dao.category.CategoryDao;
 
@@ -15,20 +15,20 @@ import com.checkount.impl.dao.category.CategoryDao;
  * This class contains methods to manage categories.
  *
  */
-public class CategoryProcess {
+public class CategoryProcessSingleton {
 
 	/** Dao Category */
 	private CategoryDao categoryDao;
 	
 	/** Singleton */
-	private static CategoryProcess uniqueInstance = new CategoryProcess();
+	private static CategoryProcessSingleton uniqueInstance = new CategoryProcessSingleton();
 	
 	/**
 	 * Constructor
 	 * @param categoryDao
 	 */
-	private CategoryProcess() {
-		DaoProcess daoProcess = DaoProcess.getInstance();
+	private CategoryProcessSingleton() {
+		DaoProcessSingleton daoProcess = DaoProcessSingleton.getInstance();
 		this.categoryDao = daoProcess.<CategoryDao>getDao(CategoryDao.class);
 	}
 
@@ -36,7 +36,7 @@ public class CategoryProcess {
 	 * Get a unique instance of CategoryProcess
 	 * @return CategoryProcess
 	 */
-	public static CategoryProcess getInstance() {
+	public static CategoryProcessSingleton getInstance() {
 		return uniqueInstance;
 	}
 
@@ -48,15 +48,15 @@ public class CategoryProcess {
 	public CategoryData getFatherCategoriesWithChildren(String idCategory) {
 
 		CategoryData result = null;
-		// Get categories from bbdd and put the result in a map
+		// Get categories from data base and put the result in a map
 		List<CategoryData> allChildrenbyIdCategory = categoryDao.getAllChildrenbyIdCategory(idCategory);
 
 		if (allChildrenbyIdCategory != null && !allChildrenbyIdCategory.isEmpty()) {
 			// Create a new aux map to save the children
 			Map<String, List<CategoryData>> mapAux = new HashMap<>();
 
-			// Check the children and assign the children with their father in the aux
-			// map
+			// Check the children and assign the children with their father in
+			// the aux map
 			for (CategoryData category : allChildrenbyIdCategory) {
 				if (category.getIdCategoryFather() != null) {
 					List<CategoryData> categoryFather = mapAux.get(category.getIdCategoryFather());

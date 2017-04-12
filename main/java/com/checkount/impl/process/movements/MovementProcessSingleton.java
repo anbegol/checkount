@@ -8,14 +8,14 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.checkount.DaoProcess;
+import com.checkount.DaoProcessSingleton;
 import com.checkount.data.category.CategoryData;
 import com.checkount.data.movement.MovementData;
 import com.checkount.data.movement.result.TotalizationResult;
 import com.checkount.impl.dao.category.CategoryDao;
 import com.checkount.impl.dao.csv.ReadCSV;
 import com.checkount.impl.dao.movements.MovementDao;
-import com.checkount.impl.process.category.CategoryProcess;
+import com.checkount.impl.process.category.CategoryProcessSingleton;
 
 /**
  * 
@@ -24,10 +24,10 @@ import com.checkount.impl.process.category.CategoryProcess;
  * This class contains methods to manage movements.
  *
  */
-public class MovementProcess {
+public class MovementProcessSingleton {
 
 	/** Logger */
-	private static Logger LOGGER = LogManager.getLogger(MovementProcess.class);
+	private static Logger LOGGER = LogManager.getLogger(MovementProcessSingleton.class);
 	/** Message Log */
 	private static final String EMPTY_CATEGORY_LIST = "Not is possible calculate the totalizations. The category's list is empty.";
 
@@ -41,15 +41,15 @@ public class MovementProcess {
 	private ReadCSV readCsv;
 
 	/** Singleton */
-	private static MovementProcess uniqueInstance = new MovementProcess();
+	private static MovementProcessSingleton uniqueInstance = new MovementProcessSingleton();
 
 	/**
 	 * Constructor
 	 * 
 	 * @param movimentDao
 	 */
-	private MovementProcess() {
-		DaoProcess daoProcess = DaoProcess.getInstance();
+	private MovementProcessSingleton() {
+		DaoProcessSingleton daoProcess = DaoProcessSingleton.getInstance();
 		this.movementDao = daoProcess.<MovementDao>getDao(MovementDao.class);
 		this.categoryDao = daoProcess.<CategoryDao>getDao(CategoryDao.class);
 		this.readCsv = new ReadCSV();
@@ -60,7 +60,7 @@ public class MovementProcess {
 	 * 
 	 * @return MovementProcess
 	 */
-	public static MovementProcess getInstance() {
+	public static MovementProcessSingleton getInstance() {
 		return uniqueInstance;
 	}
 
@@ -75,7 +75,7 @@ public class MovementProcess {
 		List<MovementData> cvsreader = readCsv.csvreader(path);
 
 		// 2. Load categories form database
-		List<CategoryData> catMovimentsList = categoryDao.getRegulationExpCatMoviments();
+		List<CategoryData> catMovimentsList = categoryDao.getRegulationExpCatMovements();
 
 		// 3. Assign type to movement
 		calculateMoviments(cvsreader, catMovimentsList);
@@ -85,22 +85,22 @@ public class MovementProcess {
 	}
 
 	/**
-	 * Calculate totalizations between two dates(iniData - endData)
+	 * Calculate totalizations between two dates (iniData - endData)
 	 * 
 	 * @param iniData
 	 *            initial data
 	 * @param endData
 	 *            end data
 	 */
-	public TotalizationResult getTotalizations(Date iniData, Date endData) {
-		// 1. Get the movements from bbdd by date
+	public TotalizationResult getTotalizations(Date iniData, Date endData, String idCategory) {
+		// 1. Get the movements from data base by date
 		List<MovementData> movementsByDate = getMovementsByDate(iniData, endData);
 
 		// 2. Calculate totalizations
 		Map<CategoryData, Double> totMap = getSumTotaliationsChildren(movementsByDate);
 
 		// 3. Get categories with their children
-		CategoryData category = CategoryProcess.getInstance().getFatherCategoriesWithChildren("CATEGORY");
+		CategoryData category = CategoryProcessSingleton.getInstance().getFatherCategoriesWithChildren(idCategory);
 
 		// 4. Calculate sum and print
 		if (category != null) {
@@ -147,7 +147,7 @@ public class MovementProcess {
 	 *            end date
 	 */
 	private List<MovementData> getMovementsByDate(Date initDate, Date endDate) {
-		List<MovementData> movimentsList = movementDao.getMoviments(initDate, endDate);
+		List<MovementData> movimentsList = movementDao.getMovements(initDate, endDate);
 		return movimentsList;
 	}
 

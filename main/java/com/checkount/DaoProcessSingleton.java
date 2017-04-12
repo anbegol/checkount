@@ -16,7 +16,7 @@ import com.checkount.impl.dao.movements.MovementDao;
  * This class management the dao's and the sessionFactory
  *
  */
-public class DaoProcess {
+public class DaoProcessSingleton {
 	
 	/***/
 	private SessionFactory sessionFactory;
@@ -25,12 +25,12 @@ public class DaoProcess {
 	private Map<Class<?>, Dao> daoMap;
 	
 	/** Singleton */
-	private static DaoProcess uniqueInstance = new DaoProcess();
+	private static DaoProcessSingleton uniqueInstance = new DaoProcessSingleton();
 	
 	/**
 	 * Constructor
 	 */
-	private DaoProcess() {
+	private DaoProcessSingleton() {
 		super();
 		this.daoMap = new HashMap<>();
 		daoMap.put(CategoryDao.class, new CategoryDao());
@@ -64,7 +64,7 @@ public class DaoProcess {
 	 * Get unique instance from dao process
 	 * @return instance of DaoProcess
 	 */
-	public static DaoProcess getInstance() {
+	public static DaoProcessSingleton getInstance() {
 		return uniqueInstance;
 	}
 }

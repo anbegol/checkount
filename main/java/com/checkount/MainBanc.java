@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.checkount.data.category.CategoryData;
 import com.checkount.data.movement.result.TotalizationResult;
-import com.checkount.impl.process.movements.MovementProcess;
+import com.checkount.impl.process.movements.MovementProcessSingleton;
 
 /**
  * Main class
@@ -57,25 +57,32 @@ public class MainBanc {
 						if (!load.equalsIgnoreCase("Y")) {
 							path = scan.nextLine();
 						}
-
-						MovementProcess movementProcess = MovementProcess.getInstance();
+						MovementProcessSingleton movementProcess = MovementProcessSingleton.getInstance();
 						movementProcess.loadMovements(path);
 
 						LOGGER.info(LOAD_MOVEMENTS);
 						option = true;
 
 					} else if (pos == 2) { // Get totalizations by date
+						
+						System.out.println("Which dates would you like to consult?");
+						System.out.println("(dd.mm.yy-dd.mm.yy)");
+						String dates = scan.nextLine();
+						String[] split = dates.split("-");
 						SimpleDateFormat formatData = new SimpleDateFormat("dd.MM.yy");
-						Date iniData = formatData.parse("01.01.16");
-						Date endData = formatData.parse("31.01.16");
+						Date iniData = formatData.parse(split[0]);
+						Date endData = formatData.parse(split[1]);
+						
+						System.out.println("Which category would you like to consult?");
+						String idCategory = scan.nextLine();
 
-						MovementProcess movementProcess = MovementProcess.getInstance();
-						TotalizationResult totalizations = movementProcess.getTotalizations(iniData, endData);
+						MovementProcessSingleton movementProcess = MovementProcessSingleton.getInstance();
+						TotalizationResult totalizations = movementProcess.getTotalizations(iniData, endData, idCategory);
 						printResultPointTwo(totalizations);
 						option = true;
 
 					} else if (pos == 3) { // Delete all movements
-						MovementProcess movementProcess = MovementProcess.getInstance();
+						MovementProcessSingleton movementProcess = MovementProcessSingleton.getInstance();
 						movementProcess.deleteMovements();
 						option = true;
 						
@@ -132,7 +139,7 @@ public class MainBanc {
 				System.out.println("MENU");
 				System.out.println("0. Exit program.");
 				System.out.println("1. Load Movements in database.");
-				System.out.println("2. Get totalizations by date from 01.01.16 to 31.01.16.");
+				System.out.println("2. Get totalizations by date.");
 				System.out.println("3. Detele all movements from database.");
 				System.out.println("****************************************");
 				

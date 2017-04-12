@@ -1,15 +1,16 @@
 package com.checkount.impl.dao.category;
 
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
-import com.checkount.DaoProcess;
+import com.checkount.DaoProcessSingleton;
 import com.checkount.data.category.CategoryData;
 import com.checkount.impl.dao.Dao;
 
@@ -20,6 +21,7 @@ public class CategoryDao extends Dao{
 	
 	/** Logger */
 	private static final Logger LOGGER = LogManager.getLogger(CategoryDao.class.getName());
+	
 	/** Messages log */
 	private static final String ERROR_GET_EXPTYPES = "Error getting the types which the expression regular is Null.";
 	private static final String ERROR_GET_CHILDRENS = "Error getting the children from category {0}";
@@ -32,38 +34,55 @@ public class CategoryDao extends Dao{
 	}
 	
 	/**
-	 * Get only the types have regulation Expression
+	 * Load categories that have the {@link CategoryData.regularExp} attribute
+	 * different than null. Using HQL (Hibernate Query Language)
+	 * 
 	 * @return List category's list
 	 */
-	public List<CategoryData> getRegulationExpCatMoviments() {
+	@SuppressWarnings("unchecked")
+	public List<CategoryData> getRegulationExpCatMovements() {
+		String get = "FROM CategoryData C WHERE C.regularExp is not Null";
+		Session session = DaoProcessSingleton.getInstance().getSessionFactory().openSession();
+		List<CategoryData> result = Collections.emptyList();
+		Transaction tx = session.beginTransaction();
 		try {
-			Session session = DaoProcess.getInstance().getSessionFactory().openSession();
-			Criteria criteria = session.createCriteria(CategoryData.class);
-			criteria.add(Restrictions.isNotNull("regularExp"));
-			return criteria.list();
+			Query<?> query = session.createQuery(get);
+			result = (List<CategoryData>) query.getResultList();
+			tx.commit();
 		} catch (Exception e) {
 			LOGGER.error(ERROR_GET_EXPTYPES, e);
-			return null;
+			tx.rollback();
+		} finally{
+			session.close();
 		}
+		return result;
 	}
 
 	/**
-	 * Get all children of idType
+	 * Load all children of idCategory
+	 * Using Native SQL
+	 * 
 	 * @return List category's list
 	 */
+	@SuppressWarnings("unchecked")
 	public List<CategoryData> getAllChildrenbyIdCategory(String idCategory) {
-		String query= "SELECT t.ID_TYPE, t.ID_TYPE_FATHER "
-						+ " FROM REGISTER_TYPE t "
-						+ " START WITH t.DESCRIPTION_T= '" + idCategory + "'"
-						+ " CONNECT BY PRIOR t.ID_TYPE = t.ID_TYPE_FATHER;";
+		List<CategoryData> result = Collections.emptyList();
+		String query = "SELECT *" + " FROM CATEGORY T" + " START WITH T.DESCRIPTION = :idCategory"
+				+ " CONNECT BY PRIOR T.ID_CATEGORY = T.ID_CATEGORY_FATHER";
 		
+		Session session = DaoProcessSingleton.getInstance().getSessionFactory().openSession();
+		Transaction tx = session.beginTransaction();
 		try {
-			Session session = DaoProcess.getInstance().getSessionFactory().openSession();
-			Criteria criteria = session.createCriteria(CategoryData.class, query);
-			return criteria.list();
+			Query<?> criteria = session.createNativeQuery(query, CategoryData.class);
+			criteria.setParameter("idCategory", idCategory);
+			result = (List<CategoryData>) criteria.getResultList();
+			tx.commit();
 		} catch (Exception e) {
 			LOGGER.error(MessageFormat.format(ERROR_GET_CHILDRENS, idCategory), e);
-			return null;
+			tx.rollback();
+		} finally{
+			session.close();
 		}
+		return result;
 	}
 }

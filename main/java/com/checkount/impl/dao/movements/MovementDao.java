@@ -1,19 +1,17 @@
 package com.checkount.impl.dao.movements;
 
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.query.Query;
 
-import com.checkount.DaoProcess;
+import com.checkount.DaoProcessSingleton;
 import com.checkount.data.movement.MovementData;
 import com.checkount.impl.dao.Dao;
 
@@ -29,6 +27,7 @@ public class MovementDao extends Dao {
 	private static final String ERROR_SAVE_MOVEMENTS = "Error to save movement in the database.";
 	private static final String ERROR_DELETE_MOVEMENTS = "Error to delete movement in the database.";
 	private static final String DELETE_MOVEMENTS = "Delete {0} movements from database";
+	private static final String ERROR_GET_MOVEMENTS = "Error to get movement from the database.";
 	
 	/**
 	 * Constructor
@@ -38,11 +37,12 @@ public class MovementDao extends Dao {
 	}
 	
 	/**
-	 * Method to insert movements into bbdd
+	 * Method to insert movements into data base
+	 * 
 	 * @param movimentsList
 	 */
 	public void insertMoviments(List<MovementData> movimentsList) {
-		Session session = DaoProcess.getInstance().getSessionFactory().openSession();
+		Session session = DaoProcessSingleton.getInstance().getSessionFactory().openSession();
 		Transaction tx = session.beginTransaction();
 		try {
 			for (MovementData movimentData : movimentsList) {
@@ -50,7 +50,7 @@ public class MovementDao extends Dao {
 				session.flush();
 			}
 			tx.commit();
-		} catch (HibernateException e) {
+		} catch (Exception e) {
 			LOGGER.error(ERROR_SAVE_MOVEMENTS, e);
 			tx.rollback();
 		} finally {
@@ -59,38 +59,47 @@ public class MovementDao extends Dao {
 	}
 	
 	/**
-	 * Method to get movements from bbdd by dates
+	 * Method to get movements from data base by dates
+	 * Using HQL (Hibernate Query Language)
 	 * @param iniDate init date
 	 * @param endDate end date
 	 * @return List of movements
 	 */
-	public List<MovementData> getMoviments(Date iniDate, Date endDate){
-		
-		Session session = DaoProcess.getInstance().getSessionFactory().openSession();
-		Criteria criteria = session.createCriteria(MovementData.class);
-		System.out.println("Ini: " + iniDate + " / end: " + endDate);
-		criteria.add(Restrictions.ge("date", iniDate));
-		criteria.add(Restrictions.lt("date", endDate));
-		List<MovementData> movList = criteria.list();
-		session.close();
-		
-		return movList;
+	@SuppressWarnings("unchecked")
+	public List<MovementData> getMovements(Date iniDate, Date endDate){
+		String getMovements = "FROM MovementData M WHERE M.date >= :iniDate AND M.date <= :endDate";
+		Session session = DaoProcessSingleton.getInstance().getSessionFactory().openSession();
+		List<MovementData> result = Collections.emptyList();
+		Transaction tx = session.beginTransaction();
+		try {
+			Query<MovementData> query = session.createQuery(getMovements);
+			query.setParameter("iniDate", iniDate);
+			query.setParameter("endDate", endDate);
+			result = query.getResultList();
+			tx.commit();
+		} catch (Exception e) {
+			LOGGER.error(ERROR_GET_MOVEMENTS, e);
+			tx.rollback();
+		} finally{
+			session.close();
+		}
+		return result;
 	}
 
 	/**
-	 * Method to delete movements from bbdd
+	 * Method to delete movements from data base
+	 * Using HQL (Hibernate Query Language)
 	 */
 	public void deleteMovements() {
 		String delete = "DELETE FROM MovementData";
-		Session session = DaoProcess.getInstance().getSessionFactory().openSession();
+		Session session = DaoProcessSingleton.getInstance().getSessionFactory().openSession();
 		int result = 0;
 		Transaction tx = session.beginTransaction();
 		try {
-			@SuppressWarnings("rawtypes")
-			Query query = session.createQuery(delete);
+			Query<?> query = session.createQuery(delete);
 			result = query.executeUpdate();
 			tx.commit();
-		} catch (HibernateException e) {
+		} catch (Exception e) {
 			LOGGER.error(ERROR_DELETE_MOVEMENTS, e);
 			tx.rollback();
 		} finally{
