@@ -112,7 +112,8 @@ public class MainBanc {
 			 * Recursive method. Print result to point 2.
 			 */
 			private void printRecursivePointTwo(CategoryData category, Map<CategoryData, Double> totMap, int pos) {
-				System.out.println(getTab(pos) + category.getDescription() + " >> " +  totMap.get(category));
+				String tot = totMap.get(category) == null  ? "--" : totMap.get(category).toString();
+				System.out.println(getTab(pos) + category.getDescription() + " >> " +  tot);
 				List<CategoryData> childrenList = category.getChildrenList();
 				if (childrenList != null) {
 					++pos;
@@ -140,7 +141,7 @@ public class MainBanc {
 				System.out.println("0. Exit program.");
 				System.out.println("1. Load Movements in database.");
 				System.out.println("2. Get totalizations by date.");
-				System.out.println("3. Detele all movements from database.");
+				System.out.println("3. Delete all movements from database.");
 				System.out.println("****************************************");
 				
 				// Get the option selected
